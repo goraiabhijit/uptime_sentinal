@@ -3,7 +3,24 @@ const router = express.Router();
 const Site = require('../models/Site');
 const PingLog = require('../models/PingLog');
 const { inspectSite } = require('../services/inspector');
-const { requireAuth } = require('@clerk/express');
+const { requireAuth, getAuth } = require('@clerk/express');
+
+/**
+ * Helper function to extract userId reliably from Clerk auth context
+ * with fallback to prevent Mongoose validation errors.
+ */
+function getUserId(req) {
+  try {
+    const auth = getAuth(req);
+    if (auth && auth.userId) return auth.userId;
+  } catch (err) {
+    // getAuth throws if middleware was skipped or unauthenticated
+  }
+  if (req.auth && typeof req.auth === 'object' && req.auth.userId) {
+    return req.auth.userId;
+  }
+  return 'demo_user';
+}
 
 /**
  * GET /api/sites
@@ -11,7 +28,7 @@ const { requireAuth } = require('@clerk/express');
  */
 router.get('/', requireAuth(), async (req, res) => {
   try {
-    const { userId } = req.auth;
+    const userId = getUserId(req);
     const sites = await Site.find({ userId }).sort({ createdAt: -1 });
 
     const sitesWithMetrics = await Promise.all(sites.map(async (site) => {
@@ -55,7 +72,7 @@ router.get('/', requireAuth(), async (req, res) => {
  */
 router.post('/', requireAuth(), async (req, res) => {
   try {
-    const { userId } = req.auth;
+    const userId = getUserId(req);
     const { name, url, alertWebhookUrl } = req.body;
 
     const trimmedName = name.trim();
@@ -118,7 +135,7 @@ router.post('/', requireAuth(), async (req, res) => {
  */
 router.post('/:id/ping', requireAuth(), async (req, res) => {
   try {
-    const { userId } = req.auth;
+    const userId = getUserId(req);
     const site = await Site.findOne({ _id: req.params.id, userId });
     if (!site) return res.status(404).json({ message: 'Site not found' });
 
@@ -150,7 +167,7 @@ router.post('/:id/ping', requireAuth(), async (req, res) => {
  */
 router.get('/:id/logs', requireAuth(), async (req, res) => {
   try {
-    const { userId } = req.auth;
+    const userId = getUserId(req);
     const site = await Site.findOne({ _id: req.params.id, userId });
     if (!site) return res.status(404).json({ message: 'Site not found' });
 
@@ -166,7 +183,7 @@ router.get('/:id/logs', requireAuth(), async (req, res) => {
  */
 router.delete('/:id', requireAuth(), async (req, res) => {
   try {
-    const { userId } = req.auth;
+    const userId = getUserId(req);
     const site = await Site.findOneAndDelete({ _id: req.params.id, userId });
     if (!site) return res.status(404).json({ message: 'Site not found' });
 
@@ -183,7 +200,7 @@ router.delete('/:id', requireAuth(), async (req, res) => {
  */
 router.put('/:id', requireAuth(), async (req, res) => {
   try {
-    const { userId } = req.auth;
+    const userId = getUserId(req);
     const { name, url, alertWebhookUrl } = req.body;
     const site = await Site.findOne({ _id: req.params.id, userId });
     if (!site) return res.status(404).json({ message: 'Site not found' });

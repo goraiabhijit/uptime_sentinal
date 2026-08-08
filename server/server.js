@@ -24,9 +24,6 @@ if (hasClerkKeys) {
   );
 }
 
-// Connect to MongoDB
-connectDB();
-
 const app = express();
 
 app.use(cors());
@@ -44,9 +41,16 @@ app.get("/", (req, res) => {
   res.send("Uptime Monitor API & Cron Engine Active");
 });
 
+// Connect to MongoDB FIRST, then start listening
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-  // Start the background monitoring worker
-  startCronWorker();
-});
+
+async function startServer() {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+    // Start the background monitoring worker
+    startCronWorker();
+  });
+}
+
+startServer();
