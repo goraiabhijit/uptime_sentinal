@@ -53,4 +53,12 @@ async function startServer() {
   });
 }
 
-startServer();
+// Only start the server when this file is run directly (local/dev).
+if (require.main === module) {
+  startServer();
+} else {
+  // When imported (e.g. by serverless adapter), do NOT start listener or cron worker here.
+  console.log("Server module imported; export app for adapter.");
+}
+
+module.exports = app;
