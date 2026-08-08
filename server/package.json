@@ -13,13 +13,16 @@
   "license": "ISC",
   "dependencies": {
     "@clerk/express": "^2.1.52",
-    "serverless-http": "^3.0.0",
+    "@readme/openapi-parser": "^7.0.1",
     "axios": "^1.19.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "js-yaml": "^5.2.3",
     "mongoose": "^9.9.1",
-    "node-cron": "^4.6.0"
+    "node-cron": "^4.6.0",
+    "serverless-http": "^3.0.0",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

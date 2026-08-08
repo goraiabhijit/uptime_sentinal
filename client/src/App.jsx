@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { SignedIn, SignedOut, SignIn, UserButton, useAuth } from '@clerk/clerk-react';
-import { Activity, ShieldCheck, AlertTriangle, XCircle, Plus, RefreshCw, Trash2, Pencil, LineChart as ChartIcon, Search } from 'lucide-react';
+import { Activity, ShieldCheck, AlertTriangle, XCircle, Plus, RefreshCw, Trash2, Pencil, LineChart as ChartIcon, Search, Github } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import ScanModal from './components/ScanModal';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/sites';
 
@@ -28,6 +29,7 @@ function Dashboard() {
   const [stats, setStats] = useState({ total: 0, up: 0, down: 0, degraded: 0 });
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showScanModal, setShowScanModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({ name: '', url: '', alertWebhookUrl: '' });
   
@@ -152,6 +154,12 @@ function Dashboard() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h2><Activity style={{ display: 'inline', marginRight: '8px' }} /> Uptime Sentinel</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button
+            onClick={() => setShowScanModal(true)}
+            style={{ padding: '0.6rem 1.2rem', backgroundColor: '#1e293b', color: '#38bdf8', border: '1px solid #334155', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            <Github size={16} /> Scan Repo
+          </button>
           <button 
             onClick={openAddModal} 
             style={{ padding: '0.6rem 1.2rem', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
@@ -321,6 +329,14 @@ function Dashboard() {
             </div>
           </form>
         </div>
+      )}
+
+      {/* GitHub Scan Modal */}
+      {showScanModal && (
+        <ScanModal
+          onClose={() => setShowScanModal(false)}
+          onSaved={() => { fetchSites(); setShowScanModal(false); }}
+        />
       )}
     </div>
   );

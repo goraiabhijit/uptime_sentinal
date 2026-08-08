@@ -8,6 +8,7 @@ dotenv.config({ path: path.join(__dirname, ".env"), override: true });
 
 const connectDB = require("./config/db");
 const siteRoutes = require("./routes/siteRoutes");
+const scanRoutes = require("./routes/scanRoutes");
 const startCronWorker = require("./services/cronWorker");
 
 let clerkMiddleware = null;
@@ -36,6 +37,8 @@ if (clerkMiddleware) {
 
 // 2. Mount API Routes
 app.use("/api/sites", siteRoutes);
+app.use("/api/scan", scanRoutes);    // POST /api/scan/github
+app.use("/api/monitors", scanRoutes); // POST /api/monitors/batch
 
 app.get("/", (req, res) => {
   res.send("Uptime Monitor API & Cron Engine Active");

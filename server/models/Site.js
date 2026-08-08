@@ -12,6 +12,10 @@ const SiteSchema = new mongoose.Schema(
     sslDaysRemaining: { type: Number, default: null },
     alertWebhookUrl: { type: String, default: "" },
     consecutiveFailures: { type: Number, default: 0 },
+    // GitHub scanner fields (null for manually added monitors)
+    method: { type: String, enum: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"], default: "GET" },
+    sourceRepo: { type: String, default: null },
+    pathParamDefaults: { type: mongoose.Schema.Types.Mixed, default: null },
   },
   { timestamps: true }
 );
